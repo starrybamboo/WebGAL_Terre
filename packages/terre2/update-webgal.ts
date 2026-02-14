@@ -10,6 +10,8 @@ async function updateWebGALEngineFiles() {
   // 要删除的文件和目录列表
   const filesToDelete = [
     path.join(templateDir, 'assets'),
+    path.join(templateDir, 'game'),
+    path.join(templateDir, 'lib'),
     path.join(templateDir, 'index.html'),
     path.join(templateDir, 'webgal-serviceworker.js'),
   ];
@@ -34,6 +36,20 @@ async function updateWebGALEngineFiles() {
       'dist',
       'assets',
     );
+    const sourceGameDir = path.join(
+      cwd,
+      'node_modules',
+      'webgal-engine',
+      'dist',
+      'game',
+    );
+    const sourceLibDir = path.join(
+      cwd,
+      'node_modules',
+      'webgal-engine',
+      'dist',
+      'lib',
+    );
     const sourceIndex = path.join(
       cwd,
       'node_modules',
@@ -51,6 +67,8 @@ async function updateWebGALEngineFiles() {
 
     // 目标文件路径
     const targetAssetsDir = path.join(templateDir, 'assets');
+    const targetGameDir = path.join(templateDir, 'game');
+    const targetLibDir = path.join(templateDir, 'lib');
     const targetIndex = path.join(templateDir, 'index.html');
     const targetServiceWorker = path.join(
       templateDir,
@@ -63,6 +81,8 @@ async function updateWebGALEngineFiles() {
     // 并行复制新文件和目录
     await Promise.all([
       fsExtra.copy(sourceAssetsDir, targetAssetsDir),
+      fsExtra.copy(sourceGameDir, targetGameDir),
+      fsExtra.copy(sourceLibDir, targetLibDir),
       fsExtra.copy(sourceIndex, targetIndex),
       fsExtra.copy(sourceServiceWorker, targetServiceWorker),
     ]);
