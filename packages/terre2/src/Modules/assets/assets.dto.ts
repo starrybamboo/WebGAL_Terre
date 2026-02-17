@@ -5,6 +5,22 @@ export class UploadFilesDto {
   targetDirectory: string;
 }
 
+export class UploadByUrlDto {
+  @ApiProperty({
+    description: 'Source file URL to download (http/https only)',
+  })
+  sourceUrl: string;
+
+  @ApiProperty({ description: 'Target directory for the uploaded files' })
+  targetDirectory: string;
+
+  @ApiProperty({
+    description: 'Target file name',
+    required: false,
+  })
+  fileName?: string;
+}
+
 export class CreateNewFileDto {
   @ApiProperty({
     description: 'The source path where the directory will be created',

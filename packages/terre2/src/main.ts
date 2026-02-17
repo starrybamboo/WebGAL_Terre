@@ -27,6 +27,38 @@ if (env.WEBGAL_PORT) {
   WEBGAL_PORT = Number.parseInt(env.WEBGAL_PORT);
 }
 
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://tuan.chat',
+  'https://www.tuan.chat',
+  'https://test.tuan.chat',
+  'https://www.test.tuan.chat',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5177',
+  'http://127.0.0.1:5177',
+];
+
+function normalizeOrigin(origin: string): string {
+  return origin.trim().replace(/\/$/, '');
+}
+
+function getAllowedOrigins(): Set<string> {
+  const fromEnv = (env.WEBGAL_ALLOWED_ORIGINS ?? '').trim();
+  const origins = (fromEnv
+    ? fromEnv.split(',')
+    : DEFAULT_ALLOWED_ORIGINS)
+    .map((item) => normalizeOrigin(item))
+    .filter((item) => item.length > 0);
+  return new Set(origins);
+}
+
+const allowedOriginSet = getAllowedOrigins();
+
+function isOriginAllowed(origin: string): boolean {
+  const normalized = normalizeOrigin(origin);
+  return allowedOriginSet.has('*') || allowedOriginSet.has(normalized);
+}
+
 /**
  * 确保模板文件存在
  * 如果 assets/templates/WebGAL_Template 下没有 index.html，则从 node_modules/webgal-engine/dist 复制所需文件
@@ -95,12 +127,27 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  // PNA 预检：当公网 HTTPS 页面访问 localhost 时，浏览器会带上
+  // Access-Control-Request-Private-Network，服务端需要明确允许。
+  app.use((req, res, next) => {
+    if (req.header('access-control-request-private-network') === 'true') {
+      res.header('Access-Control-Allow-Private-Network', 'true');
+    }
+    next();
+  });
+
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      // 非浏览器请求可能不带 Origin，按允许处理。
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      callback(null, isOriginAllowed(origin));
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: '*', // Allow all headers
-    exposedHeaders: '*', // Expose all headers
+    optionsSuccessStatus: 204,
   });
 
   app.use(json({ limit: '50mb' }));
@@ -114,6 +161,9 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useWebSocketAdapter(new WsAdapter(app));
   await app.listen(WEBGAL_PORT + 1);
+  console.log(
+    `[CORS] allowed origins: ${Array.from(allowedOriginSet).join(', ')}`,
+  );
 }
 
 bootstrap().then(() => {

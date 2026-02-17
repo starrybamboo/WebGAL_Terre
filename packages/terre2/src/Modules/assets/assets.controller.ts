@@ -21,6 +21,7 @@ import {
   RenameFileDto,
   UploadFilesDto,
   EditTextFileDto,
+  UploadByUrlDto,
 } from './assets.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { _open } from '../../util/open';
@@ -46,10 +47,12 @@ export class AssetsController {
       'Path of the directory to read assets from, including subdirectories.',
   })
   async readAssets(@Param('readDirPath') readDirPath: string) {
-    readDirPath = decodeURI(`public/${readDirPath}`);
-    const dirPath = this.webgalFs.getPathFromRoot(`${readDirPath}`);
-    const dirInfo = await this.webgalFs.getDirInfo(dirPath);
-    return { readDirPath, dirPath, dirInfo };
+    const normalizedReadDirPath = decodeURIComponent(readDirPath);
+    const readDirPathWithPublic = `public/${normalizedReadDirPath}`;
+    const dirPath = this.webgalFs.getPathFromRoot(readDirPathWithPublic);
+    const dirExists = await this.webgalFs.exists(dirPath);
+    const dirInfo = dirExists ? await this.webgalFs.getDirInfo(dirPath) : [];
+    return { readDirPath: readDirPathWithPublic, dirPath, dirInfo };
   }
 
   @Post('openDict/:dirPath(*)')
@@ -64,7 +67,7 @@ export class AssetsController {
     description: 'Directory path to open.',
   })
   async openDict(@Param('dirPath') dirPath: string) {
-    dirPath = decodeURI(`public/${dirPath}`); // Optionally decode the URI if necessary
+    dirPath = `public/${decodeURIComponent(dirPath)}`;
     const path = this.webgalFs.getPathFromRoot(dirPath);
     await _open(path);
   }
@@ -117,6 +120,47 @@ export class AssetsController {
     );
   }
 
+  @Post('uploadByUrl')
+  @ApiOperation({ summary: 'Upload file by source url' })
+  @ApiResponse({
+    status: 200,
+    description: 'Source file downloaded and uploaded successfully.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Failed to download source file.',
+  })
+  async uploadByUrl(@Body() uploadByUrlDto: UploadByUrlDto) {
+    const sourceUrl = this.parseSourceUrl(uploadByUrlDto.sourceUrl);
+    const resolvedFileName = this.resolveUploadFileName(
+      uploadByUrlDto.fileName,
+      sourceUrl,
+    );
+
+    const response = await fetch(sourceUrl.toString());
+    if (!response.ok) {
+      throw new BadRequestException(
+        `Failed to download source file, status: ${response.status}`,
+      );
+    }
+
+    const fileBuffer = Buffer.from(await response.arrayBuffer());
+    if (fileBuffer.length === 0) {
+      throw new BadRequestException('Downloaded file is empty');
+    }
+
+    const uploadResult = await this.webgalFs.writeFiles(
+      `public/${uploadByUrlDto.targetDirectory}`,
+      [{ fileName: resolvedFileName, file: fileBuffer }],
+    );
+
+    if (!uploadResult) {
+      throw new BadRequestException('Failed to save downloaded file');
+    }
+
+    return { fileName: resolvedFileName };
+  }
+
   @Post('delete')
   @ApiOperation({ summary: 'Delete File or Directory' })
   @ApiResponse({
@@ -158,5 +202,47 @@ export class AssetsController {
     const path = editTextFileData.path;
     const filePath = this.webgalFs.getPathFromRoot(`public/${path}`);
     return this.webgalFs.updateTextFile(filePath, editTextFileData.textFile);
+  }
+
+  private parseSourceUrl(rawSourceUrl: string): URL {
+    let sourceUrl: URL;
+    try {
+      sourceUrl = new URL(rawSourceUrl);
+    } catch {
+      throw new BadRequestException('Invalid sourceUrl');
+    }
+
+    if (sourceUrl.protocol !== 'http:' && sourceUrl.protocol !== 'https:') {
+      throw new BadRequestException(
+        'sourceUrl protocol must be http or https',
+      );
+    }
+
+    return sourceUrl;
+  }
+
+  private resolveUploadFileName(rawFileName: string | undefined, sourceUrl: URL) {
+    const inferredNameRaw = sourceUrl.pathname.split('/').pop() ?? '';
+    let inferredName = inferredNameRaw;
+    try {
+      inferredName = decodeURIComponent(inferredNameRaw);
+    } catch {
+      inferredName = inferredNameRaw;
+    }
+
+    const candidateName = (rawFileName ?? inferredName).trim();
+    const normalizedName = candidateName
+      .replace(/[\/\\]/g, '')
+      .replace(/[\u0000-\u001f\u007f]/g, '');
+
+    if (
+      !normalizedName ||
+      normalizedName === '.' ||
+      normalizedName === '..'
+    ) {
+      throw new BadRequestException('Invalid target file name');
+    }
+
+    return normalizedName;
   }
 }
