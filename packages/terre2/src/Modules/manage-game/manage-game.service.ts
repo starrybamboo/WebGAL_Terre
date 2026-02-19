@@ -249,28 +249,41 @@ export class ManageGameService {
       // 将游戏复制到导出目录，并附加对应的模板
       // 导出 electron-windows
       if (ejectPlatform === 'electron-windows') {
+        const electronTemplateDir = this.webgalFs.getPathFromRoot(
+          `/assets/templates/WebGAL_Electron_Template/`,
+        );
+        await this.ensureDirExistsOrThrow(
+          electronTemplateDir,
+          '缺少 Electron 导出模板目录',
+        );
+
         if (process.platform === 'win32') {
           const electronExportDir = this.webgalFs.getPath(
             `${exportDir}/electron-windows`,
           );
           await this.webgalFs.mkdir(electronExportDir, '');
-          await this.webgalFs.copy(
-            this.webgalFs.getPathFromRoot(
-              `/assets/templates/WebGAL_Electron_Template/`,
-            ),
+          await this.copyOrThrow(
+            electronTemplateDir,
             `${electronExportDir}/`,
+            '复制 Electron 模板失败',
+          );
+          await this.ensureFileExistsOrThrow(
+            `${electronExportDir}/WebGAL.exe`,
+            'Electron 模板不完整，缺少 WebGAL.exe',
           );
           if (!isEngineTemplateExist)
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(
                 '/assets/templates/WebGAL_Template',
               ),
               `${electronExportDir}/resources/app/public/`,
+              '复制 WebGAL 默认模板失败',
             );
           else
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(gameRootDir),
               `${electronExportDir}/resources/app/public/`,
+              '复制衍生引擎模板失败',
             );
           // 修改 manifest.json
           await this.webgalFs.replaceTextFile(
@@ -286,18 +299,20 @@ export class ManageGameService {
           await this.webgalFs.deleteFileOrDirectory(
             `${electronExportDir}/resources/app/public/game/`,
           );
-          await this.webgalFs.copy(
+          await this.copyOrThrow(
             gameDir,
             `${electronExportDir}/resources/app/public/game/`,
+            '复制游戏资源失败',
           );
           // 复制并替换可执行文件图标
           const icons = await this.getIcons(gameName);
           if (icons.platforms.includes('electron')) {
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(
                 `/public/games/${gameName}/icons/electron/`,
               ),
               `${electronExportDir}/`,
+              '复制 Electron 图标失败',
             );
             try {
               const rceditPath = this.webgalFs.getPathFromRoot(
@@ -328,23 +343,24 @@ export class ManageGameService {
             `${exportDir}/electron-linux`,
           );
           await this.webgalFs.mkdir(electronExportDir, '');
-          await this.webgalFs.copy(
-            this.webgalFs.getPathFromRoot(
-              `/assets/templates/WebGAL_Electron_Template/`,
-            ),
+          await this.copyOrThrow(
+            electronTemplateDir,
             `${electronExportDir}/`,
+            '复制 Electron 模板失败',
           );
           if (!isEngineTemplateExist)
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(
                 '/assets/templates/WebGAL_Template',
               ),
               `${electronExportDir}/resources/app/public/`,
+              '复制 WebGAL 默认模板失败',
             );
           else
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(gameRootDir),
               `${electronExportDir}/resources/app/public/`,
+              '复制衍生引擎模板失败',
             );
           // 修改 manifest.json
           await this.webgalFs.replaceTextFile(
@@ -360,18 +376,20 @@ export class ManageGameService {
           await this.webgalFs.deleteFileOrDirectory(
             `${electronExportDir}/resources/app/public/game/`,
           );
-          await this.webgalFs.copy(
+          await this.copyOrThrow(
             gameDir,
             `${electronExportDir}/resources/app/public/game/`,
+            '复制游戏资源失败',
           );
           // 复制图标
           const icons = await this.getIcons(gameName);
           if (icons.platforms.includes('electron')) {
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(
                 `/public/games/${gameName}/icons/electron/`,
               ),
               `${electronExportDir}/`,
+              '复制 Electron 图标失败',
             );
           }
           // 创建 app.asar
@@ -386,23 +404,24 @@ export class ManageGameService {
             `${exportDir}/WebGAL.app`,
           );
           await this.webgalFs.mkdir(electronExportDir, '');
-          await this.webgalFs.copy(
-            this.webgalFs.getPathFromRoot(
-              `/assets/templates/WebGAL_Electron_Template/`,
-            ),
+          await this.copyOrThrow(
+            electronTemplateDir,
             `${electronExportDir}/`,
+            '复制 Electron 模板失败',
           );
           if (!isEngineTemplateExist)
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(
                 '/assets/templates/WebGAL_Template',
               ),
               `${electronExportDir}/Contents/Resources/app/public/`,
+              '复制 WebGAL 默认模板失败',
             );
           else
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(gameRootDir),
               `${electronExportDir}/Contents/Resources/app/public/`,
+              '复制衍生引擎模板失败',
             );
           // 修改 manifest.json
           await this.webgalFs.replaceTextFile(
@@ -418,18 +437,20 @@ export class ManageGameService {
           await this.webgalFs.deleteFileOrDirectory(
             `${electronExportDir}/Contents/Resources/app/public/game/`,
           );
-          await this.webgalFs.copy(
+          await this.copyOrThrow(
             gameDir,
             `${electronExportDir}/Contents/Resources/app/public/game/`,
+            '复制游戏资源失败',
           );
           // 复制图标
           const icons = await this.getIcons(gameName);
           if (icons.platforms.includes('electron')) {
-            await this.webgalFs.copy(
+            await this.copyOrThrow(
               this.webgalFs.getPathFromRoot(
                 `/public/games/${gameName}/icons/electron/`,
               ),
               `${electronExportDir}/`,
+              '复制 Electron 图标失败',
             );
           }
           // 创建 app.asar
@@ -583,5 +604,27 @@ export class ManageGameService {
       unpack: '**/node_modules/steamworks.js/dist/**',
     });
     await this.webgalFs.deleteFileOrDirectory(appDir);
+  }
+
+  private async ensureDirExistsOrThrow(dirPath: string, errorMessage: string) {
+    if (!(await this.webgalFs.existsDir(dirPath))) {
+      throw new Error(`${errorMessage}: ${dirPath}`);
+    }
+  }
+
+  private async ensureFileExistsOrThrow(
+    filePath: string,
+    errorMessage: string,
+  ) {
+    if (!(await this.webgalFs.exists(filePath))) {
+      throw new Error(`${errorMessage}: ${filePath}`);
+    }
+  }
+
+  private async copyOrThrow(src: string, dest: string, errorMessage: string) {
+    const copied = await this.webgalFs.copy(src, dest);
+    if (!copied) {
+      throw new Error(`${errorMessage}（源: ${src}，目标: ${dest}）`);
+    }
   }
 }

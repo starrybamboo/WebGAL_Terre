@@ -67,7 +67,10 @@ export class WebgalFsService {
       await fs.cp(decodeURI(src), decodeURI(dest), { recursive: true });
       return true;
     } catch (error) {
-      this.logger.error('Copy file failed');
+      this.logger.error(
+        `Copy file failed: ${decodeURI(src)} -> ${decodeURI(dest)}`,
+        error instanceof Error ? error.stack : String(error),
+      );
       return false;
     }
   }
