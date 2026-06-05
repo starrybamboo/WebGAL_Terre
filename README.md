@@ -27,6 +27,23 @@ https://github.com/OpenWebGAL/WebGAL_Terre/releases
 
 https://docs.openwebgal.com/
 
+## Windows 打包
+
+在 Windows PowerShell 下可直接使用以下命令：
+
+```bash
+yarn release:win
+yarn release:win:archive
+yarn release:win:setup
+```
+
+- `release:win`：构建一个带时间戳的发布目录，避免覆盖现有 `release/`
+- `release:win:archive`：额外生成同名 zip 包
+- `release:win:setup`：在系统已安装 `makensis` 时额外生成安装器
+- `release:win:standalone`：改走 `build-standalone` 链路
+
+脚本入口为 `release-windows.ps1`。
+
 ## 参与贡献
 
 [WebGAL Terre 贡献指南](https://docs.openwebgal.com/developers/terre.html)

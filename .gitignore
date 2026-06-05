@@ -6,6 +6,9 @@ yarn.lock
 package-lock.json
 .DS_Store
 terre-electron
+.codex-tmp/
+release_local_*/
+release_local_*.zip
 packages/origine2/src/locales/en.js
 packages/origine2/src/locales/ja.js
 packages/origine2/src/locales/zhCn.js

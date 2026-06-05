@@ -14,7 +14,12 @@
 !define PRODUCT_VERSION "${VERSION}.0"
 !define COPYRIGHT "Copyright © 2022 OpenWebGAL. All rights reserved." ; 版权信息
 !define ICON_PATH ".\assets\icon.ico"
+!ifndef RELEASE_PATH
 !define RELEASE_PATH ".\release" ; 构建文件所在位置
+!endif
+!ifndef OUT_FILE
+!define OUT_FILE "./bundle/WebGal_Terre_Setup.exe"
+!endif
 
 ; 软件卸载注册表项 (当前用户)
 !define UNINSTALL_KEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
@@ -22,7 +27,7 @@
 
 ; 安装信息
 Name "${NAME} v${version} Setup" ; 安装程序名称
-OutFile "./bundle/WebGal_Terre_Setup.exe" ; 安装包输出路径
+OutFile "${OUT_FILE}" ; 安装包输出路径
 RequestExecutionLevel user ; 设置为用户权限，无需管理员
 ManifestSupportedOS all
 

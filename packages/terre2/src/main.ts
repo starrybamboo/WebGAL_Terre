@@ -20,6 +20,7 @@ import { WsAdapter } from '@nestjs/platform-ws';
 import './logger';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
+import { resolveWebgalEngineDist, syncWebgalTemplate } from './util/webgalEngine';
 
 let WEBGAL_PORT = 3000; // 默认端口
 export const version_number = `4.5.18`;
@@ -71,48 +72,11 @@ async function ensureTemplateFiles() {
   // 检查 index.html 是否存在
   const indexExists = await fsExtra.pathExists(indexPath);
   if (!indexExists) {
-    console.log('模板文件未找到，正在从 node_modules 复制...');
+    console.log('模板文件未找到，正在补齐 WebGAL 引擎模板...');
     try {
-      // 源文件路径
-      const sourceAssetsDir = path.join(
-        cwd,
-        'node_modules',
-        'webgal-engine',
-        'dist',
-        'assets',
-      );
-      const sourceIndex = path.join(
-        cwd,
-        'node_modules',
-        'webgal-engine',
-        'dist',
-        'index.html',
-      );
-      const sourceServiceWorker = path.join(
-        cwd,
-        'node_modules',
-        'webgal-engine',
-        'dist',
-        'webgal-serviceworker.js',
-      );
-
-      // 目标文件路径
-      const targetAssetsDir = path.join(templateDir, 'assets');
-      const targetIndex = path.join(templateDir, 'index.html');
-      const targetServiceWorker = path.join(
-        templateDir,
-        'webgal-serviceworker.js',
-      );
-
-      // 确保目标目录存在
-      await fsExtra.ensureDir(templateDir);
-
-      // 并行复制文件和目录
-      await Promise.all([
-        fsExtra.copy(sourceAssetsDir, targetAssetsDir),
-        fsExtra.copy(sourceIndex, targetIndex),
-        fsExtra.copy(sourceServiceWorker, targetServiceWorker),
-      ]);
+      const sourceDistDir = await resolveWebgalEngineDist(cwd);
+      console.log(`模板文件来源：${sourceDistDir}`);
+      await syncWebgalTemplate(templateDir, sourceDistDir);
 
       console.log('模板文件复制成功。');
     } catch (error) {
