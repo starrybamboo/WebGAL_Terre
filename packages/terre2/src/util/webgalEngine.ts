@@ -1,13 +1,15 @@
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
 
+function resolveLocalWebgalDist(cwd: string): string {
+  return path.resolve(cwd, '..', '..', '..', 'WebGAL', 'packages', 'webgal', 'dist');
+}
+
 function buildEngineDistCandidates(cwd: string): string[] {
   const overridePath = process.env.WEBGAL_ENGINE_DIST?.trim();
   const candidates = [
     overridePath ? path.resolve(cwd, overridePath) : '',
-    path.join(cwd, 'node_modules', 'webgal-engine', 'dist'),
-    path.join(cwd, '..', '..', 'node_modules', 'webgal-engine', 'dist'),
-    path.join(cwd, '..', '..', '..', 'WebGAL', 'packages', 'webgal', 'dist'),
+    resolveLocalWebgalDist(cwd),
   ];
 
   return Array.from(new Set(candidates.filter(Boolean)));

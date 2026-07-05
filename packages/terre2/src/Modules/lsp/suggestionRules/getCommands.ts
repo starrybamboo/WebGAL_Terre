@@ -31,7 +31,8 @@ say:<text>;
     documentation: markdown(
       `\`\`\`
 changeBg:testBG03.jpg -next;
-changeBg:<fileName> [-next];
+changeBg:testBG03.jpg -enter=fadeIn -exit=fadeOut;
+changeBg:<fileName> [-next] [-enter=animationName] [-exit=animationName];
 \`\`\``,
     ),
   },
@@ -43,7 +44,35 @@ changeBg:<fileName> [-next];
     documentation: markdown(
       `\`\`\`
 changeFigure:testFigure03.png -left -next;
-changeFigure:<fileName> [-left] [-right] [id=figureId] [-next];
+changeFigure:testFigure03.png -left -enter=fadeIn -exit=fadeOut;
+changeFigure:<fileName> [-left] [-right] [id=figureId] [-next] [-enter=animationName] [-exit=animationName];
+\`\`\``,
+    ),
+  },
+  {
+    kind: CompletionItemKind.Function,
+    label: 'composeFigure',
+    insertText: makeInsertText('composeFigure'),
+    detail: `合成立绘`,
+    documentation: markdown(
+      `\`\`\`
+composeFigure:alice_happy -base=alice/base.png -layer=alice/face_happy.png,12,34,256,256;
+changeFigure:alice_happy -composite;
+composeFigure:<alias> -base=<baseFigureLayer> -layer=<figureLayer>,x,y,width,height[ -format=png|webp|jpg];
+\`\`\``,
+    ),
+  },
+  {
+    kind: CompletionItemKind.Function,
+    label: 'tuanChatMap',
+    insertText: makeInsertText('tuanChatMap'),
+    detail: `团剧共创地图`,
+    documentation: markdown(
+      `\`\`\`
+tuanChatMap:config -background=map.webp -rows=10 -cols=10 -gridColor=#808080;
+tuanChatMap:token -roleId=1 -row=2 -col=3 -name=Alice -avatar=alice.webp;
+tuanChatMap:show;
+tuanChatMap:<reset|show|hide|config|clear|token>;
 \`\`\``,
     ),
   },
@@ -408,6 +437,19 @@ applyStyle:<origStyleName>-><newStyleName>(,<origStyleName2>-><newStyleName2>,..
       `等待一段时间，单位为毫秒
 \`\`\`
 wait: 5000; 等待5秒钟
+\`\`\``,
+    ),
+  },
+  {
+    kind: CompletionItemKind.Function,
+    label: 'callSteam',
+    insertText: makeInsertText('callSteam'),
+    detail: `调用 Steam`,
+    documentation: markdown(
+      `调用 Steam
+\`\`\`
+callSteam: -achievementId=ACH_WIN_ONE_GAME;
+callSteam: -achievementId=achievementId;
 \`\`\``,
     ),
   },

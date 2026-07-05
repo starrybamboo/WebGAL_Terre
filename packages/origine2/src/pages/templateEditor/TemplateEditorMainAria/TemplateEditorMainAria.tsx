@@ -18,9 +18,7 @@ export default function TemplateMainAria() {
 
   const targetPath = [
     ...basePath,
-    currentTab?.path?.startsWith(basePath.join('/'))
-      ? currentTab?.path?.slice(basePath.join('/').length + 1) // 兼容旧版本路径
-      : currentTab?.path,
+    currentTab?.path,
   ].join('/');
 
   return (

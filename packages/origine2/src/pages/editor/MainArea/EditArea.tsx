@@ -4,6 +4,7 @@ import ResourceDisplay, {ResourceType} from "../ResourceDisplay/ResourceDisplay"
 import GraphicalEditor from "../GraphicalEditor/GraphicalEditor";
 import EditorToolbar from "@/pages/editor/MainArea/EditorToolbar";
 import EditorDebugger from "@/pages/editor/MainArea/EditorDebugger/EditorDebugger";
+import FlowchartEditor from "../FlowchartEditor/FlowchartEditor";
 import { useGameEditorContext } from "@/store/useGameEditorStore";
 import { ITag } from "@/types/gameEditor";
 import { t } from "@lingui/macro";
@@ -26,9 +27,7 @@ export default function EditArea() {
   const getTagPage = (tag: ITag) => {
     const targetPath = [
       ...basePath,
-      tag.path.startsWith(basePath.join('/'))
-        ? tag.path.slice(basePath.join('/').length + 1) // 兼容旧版本路径
-        : tag.path,
+      tag.path,
     ].join('/');
 
     if (tag.type === "scene") {
@@ -36,6 +35,8 @@ export default function EditArea() {
         return <TextEditor isHide={tag.path !== currentTag?.path} key={tag.path}
           targetPath={targetPath}/>;
       else return <GraphicalEditor key={tag.path} targetPath={targetPath} targetName={tag.name}/>;
+    } else if (tag.type === "flowchart") {
+      return <FlowchartEditor key={tag.path} />;
     } else {
       const fileType = getFileType(tag.name);
       if (!fileType) {

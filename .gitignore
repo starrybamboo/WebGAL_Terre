@@ -1,11 +1,17 @@
 node_modules
 .idea
-release
-bundle
+/release/
+/bundle/
 yarn.lock
 package-lock.json
 .DS_Store
-terre-electron
+/terre-electron/
+/output/
+/tools/steamcmd/
+/steam/app_build_*.vdf
+/steam/depot_build_*.vdf
+!/steam/app_build_TEMPLATE.vdf
+!/steam/depot_build_TEMPLATE.vdf
 .codex-tmp/
 release_local_*/
 release_local_*.zip
@@ -15,3 +21,4 @@ packages/origine2/src/locales/zhCn.js
 packages/origine2/src/locales/en.ts
 packages/origine2/src/locales/ja.ts
 packages/origine2/src/locales/zhCn.ts
+.claude

@@ -4,27 +4,27 @@
 
 #### 新功能
 
-新增全局暗色主题，并优化各编辑器和资源视图的暗色样式
+新增实验性流程图功能，可在游戏配置中启用，创建主线和支线流程图，并为节点关联场景文件。
 
-新增模板和字体配置
+流程图编辑器支持新增、重命名、删除流程图和节点，支持拖拽连接节点，并可自动保存。
 
-新增快速同步特效
+新增回收站设置，删除游戏、模板或素材文件时可选择移动到系统回收站，降低误删风险。
 
-动画编辑器支持舞台等更多目标，扩展动画能力
+优化 Android 版运行方式，启动时会自动准备运行环境，提供更明确的启动、停止和文件入口。
 
-集成 Steamworks.js，提供 Steam 功能的图形化编辑器
-
-导出游戏增加展示到 WebGAL 主页的示例提示和指引链接
+优化预览窗口拖拽调整体验，立绘和变换目标的定位、缩放和旋转结果更贴近实时预览中的实际显示。
 
 #### 修复
 
-修复资源路径编码问题，提升多平台打包稳定性
+修复预览窗口拖拽调整在部分素材、预设目标或特殊 ID 下可能取得错误尺寸或位置的问题。
 
-优化模板编辑器侧边栏样式
+修复拖拽调整时继承的变换参数可能被写入为默认值，导致效果配置被意外改变的问题。
 
-修复提交参数顺序问题
+修复启用实验性快速同步时，实时预览可能未按预期同步的问题。
 
-修复误改 say 命令的问题
+修复默认模板文字在部分环境下可能出现颜色显示异常的问题。
+
+修复 Android 版在准备内置资源时可能启动失败的问题。
 
 <!-- English Translation -->
 ## Release Notes
@@ -33,27 +33,27 @@
 
 #### New Features
 
-Added a global dark theme and polished dark-mode styles across editors and resource views
+Added an experimental flowchart feature that can be enabled in game settings, with support for main and branch flowcharts linked to scene files.
 
-Added template and font configuration
+The flowchart editor now supports creating, renaming, and deleting flowcharts and nodes, connecting nodes by dragging, and auto-saving changes.
 
-Added a fast sync effect
+Added a Recycle Bin setting so deleted games, templates, and asset files can be moved to the system recycle bin instead of being removed permanently.
 
-Animation editor now supports stage and other targets to expand animation capabilities
+Improved the Android runtime flow. The app now prepares its runtime environment automatically on startup and provides clearer start, stop, and file entry points.
 
-Integrated Steamworks.js with a graphical editor for Steam functions
-
-Added showcase hints and a guide link on the export tab to feature games on the WebGAL homepage
+Improved preview drag adjustments so figure and transform target position, scale, and rotation better match the actual live preview display.
 
 #### Fixes
 
-Fixed resource path encoding to stabilize multi-platform packaging
+Fixed preview drag adjustment boxes possibly using the wrong size or position for some assets, preset targets, or special IDs.
 
-Improved template editor sidebar styling
+Fixed inherited transform values possibly being written as default values during drag adjustment and unexpectedly changing effect settings.
 
-Fixed submit argument order
+Fixed live preview possibly not using the expected sync mode when experimental fast sync was enabled.
 
-Fixed accidental change from `say` to comment
+Fixed default template text color possibly displaying incorrectly in some environments.
+
+Fixed Android startup possibly failing while preparing bundled resources.
 
 <!-- Japanese Translation -->
 ## リリースノート
@@ -62,24 +62,24 @@ Fixed accidental change from `say` to comment
 
 #### 新機能
 
-グローバルなダークテーマを追加し、各エディターやリソース表示のダークモードスタイルを整えました
+実験的なフローチャート機能を追加し、ゲーム設定から有効化して、メインとサブのフローチャートを作成し、ノードにシーンファイルを関連付けられるようにしました。
 
-テンプレートとフォントの設定を追加しました
+フローチャートエディターでは、フローチャートとノードの追加、名前変更、削除、ドラッグによるノード接続、自動保存に対応しました。
 
-高速同期エフェクトを追加しました
+ごみ箱設定を追加し、ゲーム、テンプレート、素材ファイルの削除時にシステムのごみ箱へ移動できるようにしました。
 
-アニメーションエディターでステージなどのターゲットを選べるようにし、表現を拡張しました
+Android 版の実行フローを改善し、起動時に実行環境を自動で準備し、開始、停止、ファイル操作の入口を分かりやすくしました。
 
-Steamworks.js を統合し、Steam 機能のグラフィカルエディターを追加しました
-
-エクスポートタブに WebGAL ホームページ掲載用のショーケースヒントとガイドリンクを追加しました
+プレビュー画面でのドラッグ調整を改善し、立ち絵や変形対象の位置、拡大率、回転がリアルタイムプレビューの表示により近くなるようにしました。
 
 #### 修正
 
-リソースパスのエンコードを修正し、マルチプラットフォームのパッケージングを安定させました
+一部の素材、プリセットターゲット、特殊 ID で、ドラッグ調整枠のサイズや位置が誤って取得されることがある問題を修正しました。
 
-テンプレートエディターのサイドバー表示を修正しました
+ドラッグ調整時に継承された変形値がデフォルト値として書き込まれ、エフェクト設定が意図せず変わることがある問題を修正しました。
 
-送信引数の順序を修正しました
+実験的な高速同期を使用している場合に、リアルタイムプレビューが期待した同期方式で動作しないことがある問題を修正しました。
 
-誤って `say` を comment に置き換えた問題を修正しました
+一部の環境でデフォルトテンプレートの文字色が正しく表示されないことがある問題を修正しました。
+
+Android 版で同梱リソースの準備中に起動が失敗することがある問題を修正しました。

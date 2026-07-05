@@ -16,6 +16,7 @@ $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $terre2Dir = Join-Path $projectRoot "packages/terre2"
 $origine2Dir = Join-Path $projectRoot "packages/origine2"
 $webgalElectronDir = Join-Path $projectRoot "packages/WebGAL-electron"
+$releaseRoot = Join-Path $projectRoot "release"
 $tempRoot = Join-Path $projectRoot ".codex-tmp/release-windows"
 
 function Write-Step {
@@ -112,10 +113,23 @@ function Copy-AndroidTemplate {
         Remove-Item -LiteralPath $destination -Recurse -Force
     }
 
-    $cachedTemplate = Join-Path $projectRoot "release/assets/templates/WebGAL_Android_Template"
-    if ((-not $RefreshAndroidTemplate) -and (Test-Path -LiteralPath $cachedTemplate)) {
-        Copy-Item -LiteralPath $cachedTemplate -Destination $destination -Recurse -Force
-        return
+    if (-not $RefreshAndroidTemplate) {
+        $cacheCandidates = @(
+            Join-Path $projectRoot "release/assets/templates/WebGAL_Android_Template"
+        )
+
+        $releaseTemplateCaches = Get-ChildItem -LiteralPath $releaseRoot -Directory -ErrorAction SilentlyContinue |
+            ForEach-Object { Join-Path $_.FullName "assets/templates/WebGAL_Android_Template" } |
+            Where-Object { (Test-Path -LiteralPath $_) -and ([System.IO.Path]::GetFullPath($_) -ne [System.IO.Path]::GetFullPath($destination)) } |
+            Sort-Object { (Get-Item -LiteralPath $_).LastWriteTimeUtc } -Descending
+
+        $cacheCandidates += $releaseTemplateCaches
+        $cachedTemplate = $cacheCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+        if ($cachedTemplate) {
+            Write-Step ("Using cached WebGAL Android template: {0}" -f $cachedTemplate)
+            Copy-Item -LiteralPath $cachedTemplate -Destination $destination -Recurse -Force
+            return
+        }
     }
 
     $cloneParent = Join-Path $tempRoot "android-template"
@@ -144,7 +158,13 @@ if ([System.IO.Path]::IsPathRooted($OutputDirName)) {
     $outputDir = [System.IO.Path]::GetFullPath($OutputDirName)
 }
 else {
-    $outputDir = Join-Path $projectRoot $OutputDirName
+    $normalizedOutputDirName = $OutputDirName.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+    if ($normalizedOutputDirName -eq "release" -or $normalizedOutputDirName.StartsWith("release$([System.IO.Path]::DirectorySeparatorChar)", [System.StringComparison]::OrdinalIgnoreCase)) {
+        $outputDir = Join-Path $projectRoot $normalizedOutputDirName
+    }
+    else {
+        $outputDir = Join-Path $releaseRoot $normalizedOutputDirName
+    }
 }
 
 Assert-ProjectPath -Path $outputDir
@@ -223,12 +243,12 @@ if ($Archive) {
     }
 
     $null = Get-Command "tar.exe" -ErrorAction Stop
-    Invoke-External -WorkingDirectory $projectRoot -Command "tar.exe" -Arguments @("-a", "-cf", $zipPath, (Split-Path -Leaf $outputDir))
+    Invoke-External -WorkingDirectory (Split-Path -Parent $outputDir) -Command "tar.exe" -Arguments @("-a", "-cf", $zipPath, (Split-Path -Leaf $outputDir))
 }
 
 $setupPath = $null
 if ($BundleNsis) {
-    $bundleDir = Join-Path $projectRoot "bundle"
+    $bundleDir = Join-Path $releaseRoot "bundle"
     Ensure-Directory -Path $bundleDir
     $setupPath = Join-Path $bundleDir ((Split-Path -Leaf $outputDir) + "_Setup.exe")
     if (Test-Path -LiteralPath $setupPath) {

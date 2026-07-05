@@ -20,10 +20,11 @@ import { WsAdapter } from '@nestjs/platform-ws';
 import './logger';
 import * as path from 'path';
 import * as fsExtra from 'fs-extra';
+import { UserDataService } from './Modules/user-data/user-data.service';
+import { version_number } from './version';
 import { resolveWebgalEngineDist, syncWebgalTemplate } from './util/webgalEngine';
 
 let WEBGAL_PORT = 3000; // 默认端口
-export const version_number = `4.5.18`;
 if (env.WEBGAL_PORT) {
   WEBGAL_PORT = Number.parseInt(env.WEBGAL_PORT);
 }
@@ -45,9 +46,7 @@ function normalizeOrigin(origin: string): string {
 
 function getAllowedOrigins(): Set<string> {
   const fromEnv = (env.WEBGAL_ALLOWED_ORIGINS ?? '').trim();
-  const origins = (fromEnv
-    ? fromEnv.split(',')
-    : DEFAULT_ALLOWED_ORIGINS)
+  const origins = (fromEnv ? fromEnv.split(',') : DEFAULT_ALLOWED_ORIGINS)
     .map((item) => normalizeOrigin(item))
     .filter((item) => item.length > 0);
   return new Set(origins);
@@ -61,15 +60,14 @@ function isOriginAllowed(origin: string): boolean {
 }
 
 /**
- * 确保模板文件存在
- * 如果 assets/templates/WebGAL_Template 下没有 index.html，则从 node_modules/webgal-engine/dist 复制所需文件
+ * 确保模板文件存在。
+ * 如果 assets/templates/WebGAL_Template 下没有 index.html，则补齐 WebGAL 引擎模板。
  */
 async function ensureTemplateFiles() {
   const cwd = process.cwd();
   const templateDir = path.join(cwd, 'assets', 'templates', 'WebGAL_Template');
   const indexPath = path.join(templateDir, 'index.html');
 
-  // 检查 index.html 是否存在
   const indexExists = await fsExtra.pathExists(indexPath);
   if (!indexExists) {
     console.log('模板文件未找到，正在补齐 WebGAL 引擎模板...');
@@ -86,8 +84,8 @@ async function ensureTemplateFiles() {
 }
 
 async function bootstrap() {
-  // 在启动应用前确保模板文件存在
   await ensureTemplateFiles();
+  await UserDataService.initialize();
 
   const app = await NestFactory.create(AppModule);
 
@@ -125,9 +123,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useWebSocketAdapter(new WsAdapter(app));
   await app.listen(WEBGAL_PORT + 1);
-  console.log(
-    `[CORS] allowed origins: ${Array.from(allowedOriginSet).join(', ')}`,
-  );
+  console.log(`[CORS] allowed origins: ${Array.from(allowedOriginSet).join(', ')}`);
 }
 
 bootstrap().then(() => {

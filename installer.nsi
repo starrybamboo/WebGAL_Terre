@@ -11,7 +11,18 @@
 !define VERSION "0.0.0"
 !searchparse /file package.json `"version": "` VERSION `"`
 
-!define PRODUCT_VERSION "${VERSION}.0"
+; Windows version resources require X.X.X.X, so strip prerelease labels:
+; 4.6.0-beta.0 -> 4.6.0.0
+!define VERSION_FOR_PARSE "v${VERSION}"
+!searchparse /noerrors "${VERSION_FOR_PARSE}" "v" VERSION_CORE_PARSED "-"
+!ifdef VERSION_CORE_PARSED
+!define VERSION_CORE "${VERSION_CORE_PARSED}"
+!else
+!define VERSION_CORE "${VERSION}"
+!endif
+!define VERSION_CORE_FOR_PARSE "v${VERSION_CORE}"
+!searchparse "${VERSION_CORE_FOR_PARSE}" "v" VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH
+!define PRODUCT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.0"
 !define COPYRIGHT "Copyright © 2022 OpenWebGAL. All rights reserved." ; 版权信息
 !define ICON_PATH ".\assets\icon.ico"
 !ifndef RELEASE_PATH
@@ -71,6 +82,7 @@ VIProductVersion "${PRODUCT_VERSION}"
 !insertmacro MUI_UNPAGE_FINISH
 
 Section -Install
+    SetShellVarContext current
     SetOutPath $INSTDIR
 
     ; 可覆写情况
@@ -99,6 +111,7 @@ SectionEnd
 
 
 Section -Uninstall
+    SetShellVarContext current
     RMDir /r "$INSTDIR\"
 
     ; 删除桌面快捷方式

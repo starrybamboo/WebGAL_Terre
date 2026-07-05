@@ -1,6 +1,6 @@
 {
   "name": "webgal-terre",
-  "version": "4.5.18",
+  "version": "4.6.2",
   "private": true,
   "scripts": {
     "dev": "concurrently \"yarn dev:terre\" \"yarn dev:origine\" \"yarn dev:start-dev-server\"",
@@ -20,6 +20,7 @@
   "workspaces": {
     "packages": [
       "packages/dev-server",
+      "packages/editor-preview-protocol",
       "packages/terre2",
       "packages/origine2"
     ],
@@ -35,11 +36,14 @@
     "iconv-lite": "^0.6.3"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "packageManager": "yarn@1.22.22",
   "resolutions": {
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0"
+  },
+  "dependencies": {
+    "@types/react": "^18.0.0"
   }
 }

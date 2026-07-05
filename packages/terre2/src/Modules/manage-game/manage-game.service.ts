@@ -13,6 +13,16 @@ import {
 import { TemplateConfigDto } from '../manage-template/manage-template.dto';
 import { promisify } from 'util';
 import { execFile } from 'child_process';
+import { join } from 'path';
+
+const DEFAULT_GAME_ASSET_DIRS = [
+  'background',
+  'bgm',
+  'figure',
+  'se',
+  'tex',
+  'vocal',
+];
 
 @Injectable()
 export class ManageGameService {
@@ -72,7 +82,7 @@ export class ManageGameService {
    */
   async openAssetsDictionary(gameName: string, subFolder?: string) {
     const path = this.webgalFs.getPathFromRoot(
-      `public/games/${gameName}/game/${subFolder}`,
+      `public/games/${gameName}/game/${subFolder ?? ''}`,
     );
     await _open(path);
   }
@@ -82,7 +92,8 @@ export class ManageGameService {
    * @param createGameData
    */
   async createGame(createGameData: CreateGameDto): Promise<boolean> {
-    const { gameName, gameDir, derivative, templateDir } = createGameData;
+    const { gameName, gameDir, derivative, templateDir, ignoreTemplate } =
+      createGameData;
     // 检查是否存在这个游戏
     const checkDir = await this.webgalFs.getDirInfo(
       this.webgalFs.getPathFromRoot(`/public/games`),
@@ -103,19 +114,29 @@ export class ManageGameService {
       gameDir,
     );
     if (derivative) {
-      await this.webgalFs.copy(
+      const copyResult = await this.webgalFs.copy(
         this.webgalFs.getPathFromRoot(
           `/assets/templates/Derivative_Engine/${derivative}/`,
         ),
         this.webgalFs.getPathFromRoot(`/public/games/${gameDir}/`),
       );
+      if (!copyResult) return false;
+      await this.webgalFs.replaceTextFile(
+        this.webgalFs.getPathFromRoot(
+          `/public/games/${gameDir}/game/config.txt`,
+        ),
+        /Game_name:.*?;/,
+        `Game_name:${gameName};`,
+      );
     } else {
-      await this.webgalFs.copy(
+      const copyResult = await this.webgalFs.copy(
         this.webgalFs.getPathFromRoot(
           '/assets/templates/WebGAL_Template/game/',
         ),
         this.webgalFs.getPathFromRoot(`/public/games/${gameDir}/game/`),
       );
+      if (!copyResult) return false;
+      await this.cleanDefaultGameTemplate(gameName, gameDir);
     }
 
     await this.webgalFs.replaceTextFile(
@@ -124,9 +145,34 @@ export class ManageGameService {
       `Game_name:${gameName};`,
     );
 
-    if (templateDir) {
+    // 应用模板时删除原有模板
+    if (!ignoreTemplate) {
+      const gameTemplatePath = this.webgalFs.getPathFromRoot(
+        `/public/games/${gameDir}/game/template`,
+      );
+      await this.webgalFs.deleteFileOrDirectory(gameTemplatePath);
+    }
+
+    let templateApplied = false;
+    if (templateDir && !ignoreTemplate) {
+      const templatePath = this.webgalFs.getPathFromRoot(
+        `/public/templates/${templateDir}/`,
+      );
+      if (await this.webgalFs.existsDir(templatePath)) {
+        await this.webgalFs.copy(
+          templatePath,
+          this.webgalFs.getPathFromRoot(
+            `/public/games/${gameDir}/game/template/`,
+          ),
+        );
+        templateApplied = true;
+      }
+    }
+    if (!templateApplied && !ignoreTemplate) {
       await this.webgalFs.copy(
-        this.webgalFs.getPathFromRoot(`/public/templates/${templateDir}/`),
+        this.webgalFs.getPathFromRoot(
+          '/assets/templates/WebGAL_Default_Template/',
+        ),
         this.webgalFs.getPathFromRoot(
           `/public/games/${gameDir}/game/template/`,
         ),
@@ -134,6 +180,33 @@ export class ManageGameService {
     }
 
     return true;
+  }
+
+  private async cleanDefaultGameTemplate(gameName: string, gameDir: string) {
+    const gameRoot = this.webgalFs.getPathFromRoot(
+      `/public/games/${gameDir}/game`,
+    );
+    // 新项目只保留必要结构，避免把引擎 demo 的素材当作用户项目资源带入。
+    const pathsToRemove = [...DEFAULT_GAME_ASSET_DIRS, 'scene'];
+    await Promise.all(
+      pathsToRemove.map((path) =>
+        this.webgalFs.deleteFileOrDirectory(`${gameRoot}/${path}`),
+      ),
+    );
+    await Promise.all(
+      [...DEFAULT_GAME_ASSET_DIRS, 'scene'].map((dirName) =>
+        this.webgalFs.mkdir(gameRoot, dirName),
+      ),
+    );
+    await this.webgalFs.updateTextFile(
+      `${gameRoot}/config.txt`,
+      this.buildCleanGameConfig(gameName, gameDir),
+    );
+    await this.webgalFs.updateTextFile(`${gameRoot}/scene/start.txt`, '');
+  }
+
+  private buildCleanGameConfig(gameName: string, gameDir: string) {
+    return [`Game_name:${gameName};`, `Game_key:${gameDir};`, ''].join('\n');
   }
 
   // 获取游戏配置
@@ -178,6 +251,97 @@ export class ManageGameService {
           ? 'com.openwebgal.demo'
           : config.Package_name,
     };
+  }
+
+  async updateAnimationTable(gameName: string): Promise<boolean> {
+    const animationDir = this.webgalFs.getPathFromRoot(
+      `/public/games/${gameName}/game/animation`,
+    );
+    if (!(await this.webgalFs.existsDir(animationDir))) {
+      return false;
+    }
+    const animationList = await this.collectAnimationList(animationDir);
+    await this.writeAnimationTable(gameName, animationList);
+    return true;
+  }
+
+  private async collectAnimationList(
+    animationRootDir: string,
+  ): Promise<string[]> {
+    // Collect first, then sort once to keep output stable.
+    const animationList = await this.collectAnimationListFromDir(
+      animationRootDir,
+      '',
+    );
+    return animationList.sort((a, b) => a.localeCompare(b));
+  }
+
+  /**
+   * Depth-first traversal of the animation directory tree.
+   * Returns paths relative to `game/animation` without `.json` suffix.
+   */
+  private async collectAnimationListFromDir(
+    currentDir: string,
+    currentRelativeDir: string,
+  ): Promise<string[]> {
+    const entries = await this.webgalFs.getDirInfo(currentDir);
+    const result: string[] = [];
+
+    for (const entry of entries) {
+      if (this.shouldIgnoreAnimationEntry(entry.name)) {
+        continue;
+      }
+
+      const relativeEntryPath = this.joinRelativePath(
+        currentRelativeDir,
+        entry.name,
+      );
+
+      if (entry.isDir) {
+        const childResult = await this.collectAnimationListFromDir(
+          join(currentDir, entry.name),
+          relativeEntryPath,
+        );
+        result.push(...childResult);
+        continue;
+      }
+
+      if (!this.isAnimationJsonFile(entry)) {
+        continue;
+      }
+
+      result.push(this.stripJsonExtension(relativeEntryPath));
+    }
+
+    return result;
+  }
+
+  private shouldIgnoreAnimationEntry(name: string): boolean {
+    return name.startsWith('.');
+  }
+
+  private isAnimationJsonFile(file: IFileInfo): boolean {
+    if (file.isDir) return false;
+    if (file.name.toLowerCase() === 'animationtable.json') return false;
+    return file.extName.toLowerCase() === '.json';
+  }
+
+  private joinRelativePath(parent: string, child: string): string {
+    return parent ? `${parent}/${child}` : child;
+  }
+
+  private stripJsonExtension(path: string): string {
+    return path.replace(/\.json$/i, '');
+  }
+
+  private async writeAnimationTable(gameName: string, animationList: string[]) {
+    const animationTablePath = this.webgalFs.getPathFromRoot(
+      `/public/games/${gameName}/game/animation/animationTable.json`,
+    );
+    await this.webgalFs.updateTextFile(
+      animationTablePath,
+      `${JSON.stringify(animationList, null, 2)}\n`,
+    );
   }
 
   async getIcons(gameDir: string): Promise<IconsDto> {
@@ -526,13 +690,19 @@ export class ManageGameService {
         );
         await this.webgalFs.mkdir(
           // eslint-disable-next-line prettier/prettier
-          `${androidExportDir}/app/src/main/java/${gameConfig.Package_name.replace(/\./g, '/')}`,
+          `${androidExportDir}/app/src/main/java/${gameConfig.Package_name.replace(
+            /\./g,
+            '/',
+          )}`,
           '',
         );
         await this.webgalFs.copy(
           `${androidExportDir}/app/src/main/java/MainActivity.kt`,
           // eslint-disable-next-line prettier/prettier
-          `${androidExportDir}/app/src/main/java/${gameConfig.Package_name.replace(/\./g, '/')}/MainActivity.kt`
+          `${androidExportDir}/app/src/main/java/${gameConfig.Package_name.replace(
+            /\./g,
+            '/',
+          )}/MainActivity.kt`,
         );
         await this.webgalFs.deleteFileOrDirectory(
           `${androidExportDir}/app/src/main/java/MainActivity.kt`,
