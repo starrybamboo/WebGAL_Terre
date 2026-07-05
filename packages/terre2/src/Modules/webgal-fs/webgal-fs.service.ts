@@ -4,7 +4,19 @@ import archiver = require('archiver');
 import AdmZip = require('adm-zip');
 import { basename, dirname, extname, isAbsolute, join } from 'path';
 import { UserDataService } from '../user-data/user-data.service';
-import trash from 'trash';
+
+type TrashFn = (
+  input: string | readonly string[],
+  options?: { readonly glob?: boolean },
+) => Promise<void>;
+
+async function loadTrash(): Promise<TrashFn> {
+  const importer = new Function('specifier', 'return import(specifier)') as (
+    specifier: string,
+  ) => Promise<{ default: TrashFn }>;
+  const trashModule = await importer('trash');
+  return trashModule.default;
+}
 
 export interface IFileInfo {
   name: string;
@@ -283,6 +295,7 @@ export class WebgalFsService {
       } else {
         this.logger.log(`丢弃文件: ${path}`);
       }
+      const trash = await loadTrash();
       await trash(path, { glob: false });
       return true;
     } catch (error) {

@@ -8,6 +8,7 @@ describe('ManageGameService', () => {
     getPathFromRoot: jest.Mock;
     mkdir: jest.Mock;
     copy: jest.Mock;
+    existsDir: jest.Mock;
     replaceTextFile: jest.Mock;
     deleteFileOrDirectory: jest.Mock;
     updateTextFile: jest.Mock;
@@ -19,6 +20,7 @@ describe('ManageGameService', () => {
       getPathFromRoot: jest.fn((path: string) => path),
       mkdir: jest.fn().mockResolvedValue(undefined),
       copy: jest.fn().mockResolvedValue(true),
+      existsDir: jest.fn().mockResolvedValue(false),
       replaceTextFile: jest.fn().mockResolvedValue('Replaced.'),
       deleteFileOrDirectory: jest.fn().mockResolvedValue(true),
       updateTextFile: jest.fn().mockResolvedValue('Updated.'),
@@ -71,7 +73,18 @@ describe('ManageGameService', () => {
       '/public/games/blank-game/game/scene/start.txt',
       '',
     );
-    expect(webgalFs.replaceTextFile).not.toHaveBeenCalled();
+    expect(webgalFs.replaceTextFile).toHaveBeenCalledWith(
+      '/public/games/blank-game/game/config.txt',
+      /Game_name:.*?;/,
+      'Game_name:空白项目;',
+    );
+    expect(webgalFs.deleteFileOrDirectory).toHaveBeenCalledWith(
+      '/public/games/blank-game/game/template',
+    );
+    expect(webgalFs.copy).toHaveBeenCalledWith(
+      '/assets/templates/WebGAL_Default_Template/',
+      '/public/games/blank-game/game/template/',
+    );
   });
 
   it('keeps derivative game creation behavior', async () => {
@@ -91,7 +104,13 @@ describe('ManageGameService', () => {
       /Game_name:.*?;/,
       'Game_name:派生项目;',
     );
-    expect(webgalFs.deleteFileOrDirectory).not.toHaveBeenCalled();
+    expect(webgalFs.deleteFileOrDirectory).toHaveBeenCalledWith(
+      '/public/games/derivative-game/game/template',
+    );
+    expect(webgalFs.copy).toHaveBeenCalledWith(
+      '/assets/templates/WebGAL_Default_Template/',
+      '/public/games/derivative-game/game/template/',
+    );
     expect(webgalFs.updateTextFile).not.toHaveBeenCalled();
   });
 });
