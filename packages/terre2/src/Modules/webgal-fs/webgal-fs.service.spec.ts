@@ -56,6 +56,22 @@ describe('WebgalFsService', () => {
     await expect(fs.stat(targetFilePath)).resolves.toBeDefined();
   });
 
+  it('creates missing parent directories when updating a text file', async () => {
+    const targetFilePath = join(
+      testRoot,
+      'animation',
+      'tuanchat',
+      'enter.json',
+    );
+
+    await expect(
+      service.updateTextFile(targetFilePath, '{"alpha":1}\n'),
+    ).resolves.toBe('Updated.');
+    await expect(fs.readFile(targetFilePath, 'utf8')).resolves.toBe(
+      '{"alpha":1}\n',
+    );
+  });
+
   it('blocks creating files out of workspace', async () => {
     const outsidePath = join(
       resolve(process.cwd(), '..'),

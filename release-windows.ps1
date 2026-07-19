@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$OutputDirName = ("release_local_" + (Get-Date -Format "yyyyMMdd_HHmmss")),
+    [string]$OutputDirName = "release_local_latest",
     [switch]$BuildStandalone,
     [switch]$Archive,
     [switch]$BundleNsis,
@@ -18,6 +18,7 @@ $origine2Dir = Join-Path $projectRoot "packages/origine2"
 $webgalElectronDir = Join-Path $projectRoot "packages/WebGAL-electron"
 $releaseRoot = Join-Path $projectRoot "release"
 $tempRoot = Join-Path $projectRoot ".codex-tmp/release-windows"
+$androidTemplateCacheDir = Join-Path $releaseRoot "cache/WebGAL_Android_Template"
 
 function Write-Step {
     param([string]$Message)
@@ -113,23 +114,10 @@ function Copy-AndroidTemplate {
         Remove-Item -LiteralPath $destination -Recurse -Force
     }
 
-    if (-not $RefreshAndroidTemplate) {
-        $cacheCandidates = @(
-            Join-Path $projectRoot "release/assets/templates/WebGAL_Android_Template"
-        )
-
-        $releaseTemplateCaches = Get-ChildItem -LiteralPath $releaseRoot -Directory -ErrorAction SilentlyContinue |
-            ForEach-Object { Join-Path $_.FullName "assets/templates/WebGAL_Android_Template" } |
-            Where-Object { (Test-Path -LiteralPath $_) -and ([System.IO.Path]::GetFullPath($_) -ne [System.IO.Path]::GetFullPath($destination)) } |
-            Sort-Object { (Get-Item -LiteralPath $_).LastWriteTimeUtc } -Descending
-
-        $cacheCandidates += $releaseTemplateCaches
-        $cachedTemplate = $cacheCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-        if ($cachedTemplate) {
-            Write-Step ("Using cached WebGAL Android template: {0}" -f $cachedTemplate)
-            Copy-Item -LiteralPath $cachedTemplate -Destination $destination -Recurse -Force
-            return
-        }
+    if ((-not $RefreshAndroidTemplate) -and (Test-Path -LiteralPath $androidTemplateCacheDir)) {
+        Write-Step ("Using cached WebGAL Android template: {0}" -f $androidTemplateCacheDir)
+        Copy-Item -LiteralPath $androidTemplateCacheDir -Destination $destination -Recurse -Force
+        return
     }
 
     $cloneParent = Join-Path $tempRoot "android-template"
@@ -144,6 +132,14 @@ function Copy-AndroidTemplate {
     }
 
     Copy-Item -LiteralPath $cloneDir -Destination $destination -Recurse -Force
+
+    # 固定 release 目录后不再扫描历史产物，Android 模板只维护一份显式缓存。
+    Assert-ProjectPath -Path $androidTemplateCacheDir
+    Ensure-Directory -Path (Split-Path -Parent $androidTemplateCacheDir)
+    if (Test-Path -LiteralPath $androidTemplateCacheDir) {
+        Remove-Item -LiteralPath $androidTemplateCacheDir -Recurse -Force
+    }
+    Copy-Item -LiteralPath $cloneDir -Destination (Split-Path -Parent $androidTemplateCacheDir) -Recurse -Force
 }
 
 function Remove-OptionalPath {

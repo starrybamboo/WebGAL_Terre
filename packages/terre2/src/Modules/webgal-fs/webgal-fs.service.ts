@@ -364,17 +364,27 @@ export class WebgalFsService {
    * @param content 文本内容
    */
   async updateTextFile(path: string, content: string) {
-    return await new Promise(async (resolve) => {
-      fs.writeFile(decodeURI(path), content)
-        .then(() => {
-          this.logger.log(`更新文件: ${decodeURI(path)}`);
-          resolve('Updated.');
-        })
-        .catch(() => {
-          this.logger.error(`更新文件失败: ${decodeURI(path)}`);
-          resolve('path error or no right.');
-        });
-    });
+    const decodedPath = decodeURI(path);
+    try {
+      if (!this.isPathInsideAllowedRoots(decodedPath)) {
+        throw new Error('Path is out of allowed roots');
+      }
+      if (WebgalFsService.hasInvalidPathSegments(decodedPath)) {
+        throw new Error('There are unexpected marks in path');
+      }
+
+      // 模板升级可能新增资源子目录，写入文件前一并补齐目录层级。
+      await fs.mkdir(dirname(decodedPath), { recursive: true });
+      await fs.writeFile(decodedPath, content);
+      this.logger.log(`更新文件: ${decodedPath}`);
+      return 'Updated.';
+    } catch (error) {
+      this.logger.error(
+        `更新文件失败: ${decodedPath}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+      return 'path error or no right.';
+    }
   }
   /**
    * 替换文本文件中的文本
