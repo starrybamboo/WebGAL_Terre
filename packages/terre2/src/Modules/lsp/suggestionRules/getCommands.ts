@@ -45,34 +45,7 @@ changeBg:<fileName> [-next] [-enter=animationName] [-exit=animationName];
       `\`\`\`
 changeFigure:testFigure03.png -left -next;
 changeFigure:testFigure03.png -left -enter=fadeIn -exit=fadeOut;
-changeFigure:<fileName> [-left] [-right] [id=figureId] [-next] [-enter=animationName] [-exit=animationName];
-\`\`\``,
-    ),
-  },
-  {
-    kind: CompletionItemKind.Function,
-    label: 'composeFigure',
-    insertText: makeInsertText('composeFigure'),
-    detail: `合成立绘`,
-    documentation: markdown(
-      `\`\`\`
-composeFigure:alice_happy -base=alice/base.png -layer=alice/face_happy.png,12,34,256,256;
-changeFigure:alice_happy -composite;
-composeFigure:<alias> -base=<baseFigureLayer> -layer=<figureLayer>,x,y,width,height[ -format=png|webp|jpg];
-\`\`\``,
-    ),
-  },
-  {
-    kind: CompletionItemKind.Function,
-    label: 'tuanChatMap',
-    insertText: makeInsertText('tuanChatMap'),
-    detail: `团剧共创地图`,
-    documentation: markdown(
-      `\`\`\`
-tuanChatMap:config -background=map.webp -rows=10 -cols=10 -gridColor=#808080;
-tuanChatMap:token -roleId=1 -row=2 -col=3 -name=Alice -avatar=alice.webp;
-tuanChatMap:show;
-tuanChatMap:<reset|show|hide|config|clear|token>;
+changeFigure:<fileName> [-left] [-right] [-left13] [-right13] [-left14] [-right14] [id=figureId] [-next] [-enter=animationName] [-exit=animationName];
 \`\`\``,
     ),
   },
@@ -274,9 +247,28 @@ setVar:<expression>;
     detail: `场景调用`,
     documentation: markdown(
       `如果你需要在执行完调用的场景后回到先前的场景（即父场景），你可以使用 callScene 来调用场景
+
+\`-参数名=值\` 会成为被调用场景的局部变量，\`-writeReturnTo\` 指定返回值写回调用方的哪个变量
 \`\`\`
 callScene:Chapter-2.txt;
-callScene:<newSceneFileName>;
+callScene:battle.txt -enemy=史莱姆 -hp=100 -writeReturnTo=result;
+callScene:<newSceneFileName> [-参数名=值] [-writeReturnTo=variableName];
+\`\`\``,
+    ),
+  },
+  {
+    kind: CompletionItemKind.Function,
+    label: 'return',
+    insertText: makeInsertText('return'),
+    detail: `从调用的场景返回`,
+    documentation: markdown(
+      `提前结束当前被 callScene 调用的场景，回到调用位置继续执行。冒号后是返回值，求值规则同 setVar
+
+被调用的场景执行到末尾时会自动返回，只有需要提前返回时才用得上 return
+\`\`\`
+return;
+return:胜利;
+return:{hp}>0;
 \`\`\``,
     ),
   },

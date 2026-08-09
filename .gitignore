@@ -15,10 +15,6 @@ package-lock.json
 .codex-tmp/
 release_local_*/
 release_local_*.zip
-packages/origine2/src/locales/en.js
-packages/origine2/src/locales/ja.js
-packages/origine2/src/locales/zhCn.js
-packages/origine2/src/locales/en.ts
-packages/origine2/src/locales/ja.ts
-packages/origine2/src/locales/zhCn.ts
+packages/origine2/src/locales/*.js
+packages/origine2/src/locales/*.ts
 .claude

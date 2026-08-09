@@ -43,7 +43,7 @@ public/templates/*
 /assets/templates/Derivative_Engine/*
 !/assets/templates/Derivative_Engine/.gitkeep
 !public/templates/WebGAL Black
-<<!public/templates/WebGAL_Classic
+!public/templates/WebGAL_Classic
 !public/templates/WebGAL TuanChat
 !public/templates/WebGAL TuanChat/**
 /assets/templates/WebGAL_Template/assets
@@ -51,4 +51,3 @@ public/templates/*
 /assets/templates/WebGAL_Template/webgal-serviceworker.js
 
 lib/**/*
-

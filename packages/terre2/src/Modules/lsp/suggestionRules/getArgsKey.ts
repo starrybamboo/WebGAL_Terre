@@ -21,6 +21,7 @@ export function getArgsKey(
         leftSayKey,
         rightSayKey,
         centerSayKey,
+        ...centeredPositionSayKeys,
       ];
     }
     case commandType.changeBg: {
@@ -51,6 +52,7 @@ export function getArgsKey(
         idFigureKey,
         leftKey,
         rightKey,
+        ...centeredPositionKeys,
         transformKey,
         zIndexKey,
         motionKey,
@@ -69,26 +71,6 @@ export function getArgsKey(
         blinkKey,
         focusKey,
         blendModeKey,
-        compositeKey,
-      ];
-    }
-    case commandType.composeFigure: {
-      return [whenKey, baseKey, layerKey, formatKey, qualityKey, widthKey, heightKey];
-    }
-    case commandType.tuanChatMap: {
-      return [
-        whenKey,
-        backgroundKey,
-        rowsKey,
-        colsKey,
-        gridColorKey,
-        clearTokensKey,
-        roleIdKey,
-        rowKey,
-        colKey,
-        nameKey,
-        avatarKey,
-        removeKey,
       ];
     }
     case commandType.bgm: {
@@ -145,9 +127,12 @@ export function getArgsKey(
       return [];
     }
     case commandType.setVar: {
-      return [whenKey, globalKey];
+      return [whenKey, globalKey, localKey];
     }
     case commandType.callScene: {
+      return [whenKey, writeReturnToKey];
+    }
+    case commandType.return: {
       return [whenKey];
     }
     case commandType.showVars: {
@@ -424,6 +409,48 @@ changeFigure:k2.png -next;
 \`\`\`
   `),
 };
+
+/**
+ * 除左右靠边定位以外的立绘位置，均以立绘中心为基准定位
+ */
+const centeredFigurePositions: Array<[string, string]> = [
+  ['left13', '左侧 1/3'],
+  ['right13', '右侧 1/3'],
+  ['left14', '左侧 1/4'],
+  ['right14', '右侧 1/4'],
+];
+
+const centeredPositionKeys: CompletionItem[] = centeredFigurePositions.map(
+  ([position, name]) => ({
+    kind: CompletionItemKind.Constant,
+    label: position,
+    insertText: position,
+    detail: `将立绘置于${name}处`,
+    documentation: markdown(`
+将立绘放置在舞台${name}处，以立绘的中心为基准定位
+
+\`\`\`
+changeFigure:testFigure03.png -${position};
+\`\`\`
+  `),
+  }),
+);
+
+const centeredPositionSayKeys: CompletionItem[] = centeredFigurePositions.map(
+  ([position, name]) => ({
+    kind: CompletionItemKind.Constant,
+    label: position,
+    insertText: position,
+    detail: `对话属于${name}处的立绘`,
+    documentation: markdown(`
+指定该对话所属的立绘为${name}处的立绘
+
+\`\`\`
+WebGAL:这是${name}处立绘的对话 -${position};
+\`\`\`
+  `),
+  }),
+);
 
 const leftSayKey: CompletionItem = {
   kind: CompletionItemKind.Constant,
@@ -776,141 +803,6 @@ changeFigure:xxx.json -focus={"x":0.5,"y":0.0,"instant":false};
   `),
 };
 
-const compositeKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'composite',
-  insertText: 'composite',
-  detail: '使用 composeFigure 生成的合成立绘别名',
-  documentation: markdown(`
-\`\`\`
-composeFigure:alice_happy -base=alice/base.png -layer=alice/face_happy.png,12,34,256,256;
-changeFigure:alice_happy -composite;
-\`\`\`
-`),
-};
-
-const baseKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'base',
-  insertText: 'base=',
-  detail: '合成立绘底图',
-  documentation: markdown(`
-\`\`\`
-composeFigure:alice_happy -base=alice/base.png;
-\`\`\`
-`),
-};
-
-const layerKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'layer',
-  insertText: 'layer=',
-  detail: '合成立绘叠加图层，可携带 x,y,width,height',
-  documentation: markdown(`
-\`\`\`
-composeFigure:alice_happy -base=alice/base.png -layer=alice/face_happy.png,12,34,256,256;
-\`\`\`
-`),
-};
-
-const formatKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'format',
-  insertText: 'format=',
-  detail: '合成输出格式：png、webp 或 jpg',
-};
-
-const qualityKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'quality',
-  insertText: 'quality=',
-  detail: 'webp/jpg 输出质量，范围 0-1',
-};
-
-const widthKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'width',
-  insertText: 'width=',
-  detail: '合成画布宽度',
-};
-
-const heightKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'height',
-  insertText: 'height=',
-  detail: '合成画布高度',
-};
-
-const backgroundKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'background',
-  insertText: 'background=',
-  detail: '团剧共创地图背景图',
-};
-
-const rowsKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'rows',
-  insertText: 'rows=',
-  detail: '团剧共创地图行数',
-};
-
-const colsKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'cols',
-  insertText: 'cols=',
-  detail: '团剧共创地图列数',
-};
-
-const gridColorKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'gridColor',
-  insertText: 'gridColor=',
-  detail: '团剧共创地图网格颜色',
-};
-
-const clearTokensKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'clearTokens',
-  insertText: 'clearTokens',
-  detail: '配置地图时清空现有棋子',
-};
-
-const roleIdKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'roleId',
-  insertText: 'roleId=',
-  detail: '团剧共创角色 ID',
-};
-
-const rowKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'row',
-  insertText: 'row=',
-  detail: '团剧共创地图棋子行坐标',
-};
-
-const colKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'col',
-  insertText: 'col=',
-  detail: '团剧共创地图棋子列坐标',
-};
-
-const avatarKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'avatar',
-  insertText: 'avatar=',
-  detail: '团剧共创地图棋子头像',
-};
-
-const removeKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'remove',
-  insertText: 'remove',
-  detail: '移除团剧共创地图棋子',
-};
-
 const unlocknameKey: CompletionItem = {
   kind: CompletionItemKind.Constant,
   label: 'unlockname',
@@ -1026,6 +918,43 @@ label:turn-2;
 二周目;
 changeScene:二周目剧情.txt;
 \`\`\`
+  `),
+};
+
+const localKey: CompletionItem = {
+  kind: CompletionItemKind.Constant,
+  label: 'local',
+  insertText: 'local',
+  detail: '局部变量',
+  documentation: markdown(`
+写入当前场景的局部变量，也就是 \`callScene\` 传进来的参数所在的那个命名空间。局部变量随场景调用结束而消失，不会影响调用方的同名变量。
+
+\`\`\`ws
+; battle.txt，由 callScene:battle.txt -hp=100 调用
+setVar:hp=hp-30 -local;
+旁白:受到攻击，剩余血量 {hp}。;
+\`\`\`
+
+不加 \`-local\` 写的是普通变量，而读取时局部变量优先，这次写入将读不出来。要改传进来的参数，必须加 \`-local\`。
+
+\`-local\` 与 \`-global\` 互斥，同时写时按 \`-global\` 处理。
+  `),
+};
+
+const writeReturnToKey: CompletionItem = {
+  kind: CompletionItemKind.Constant,
+  label: 'writeReturnTo',
+  insertText: 'writeReturnTo=',
+  detail: '返回值写回的变量',
+  documentation: markdown(`
+指定被调用场景的返回值写回调用方的哪个变量，写入方式与不带参数的 \`setVar\` 相同。
+
+\`\`\`ws
+callScene:battle.txt -enemy=史莱姆 -writeReturnTo=result;
+旁白:战斗结果是 {result}。;
+\`\`\`
+
+被调用的场景没有执行 \`return\` 而自然结束时，写回的是空字符串。
   `),
 };
 

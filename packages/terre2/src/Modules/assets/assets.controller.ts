@@ -208,9 +208,13 @@ export class AssetsController {
     description: 'Failed to trash the file or directory.',
   })
   async trashFileOrDir(@Body() fileOperationDto: TrashFileOrDirDto) {
-    return this.webgalFs.trashFileOrDirectory(
+    const result = await this.webgalFs.trashFileOrDirectory(
       this.webgalFs.getPathFromRoot(`public/${fileOperationDto.source}`),
     );
+    if (!result) {
+      throw new BadRequestException('Failed to trash the file or directory.');
+    }
+    return result;
   }
 
   @Post('editTextFile')
@@ -262,15 +266,16 @@ export class AssetsController {
     }
 
     if (sourceUrl.protocol !== 'http:' && sourceUrl.protocol !== 'https:') {
-      throw new BadRequestException(
-        'sourceUrl protocol must be http or https',
-      );
+      throw new BadRequestException('sourceUrl protocol must be http or https');
     }
 
     return sourceUrl;
   }
 
-  private resolveUploadFileName(rawFileName: string | undefined, sourceUrl: URL) {
+  private resolveUploadFileName(
+    rawFileName: string | undefined,
+    sourceUrl: URL,
+  ) {
     const inferredNameRaw = sourceUrl.pathname.split('/').pop() ?? '';
     let inferredName = inferredNameRaw;
     try {
@@ -284,11 +289,7 @@ export class AssetsController {
       .replace(/[\/\\]/g, '')
       .replace(/[\u0000-\u001f\u007f]/g, '');
 
-    if (
-      !normalizedName ||
-      normalizedName === '.' ||
-      normalizedName === '..'
-    ) {
+    if (!normalizedName || normalizedName === '.' || normalizedName === '..') {
       throw new BadRequestException('Invalid target file name');
     }
 

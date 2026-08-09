@@ -41,9 +41,7 @@ export enum commandType {
   applyStyle = 32,
   wait = 33,
   callSteam = 34,
-  dice = 35,
-  composeFigure = 36,
-  tuanChatMap = 37,
+  return = 35,
 }
 
 export function markdown(content: string): MarkupContent {
@@ -52,5 +50,3 @@ export function markdown(content: string): MarkupContent {
     value: content,
   };
 }
-
-

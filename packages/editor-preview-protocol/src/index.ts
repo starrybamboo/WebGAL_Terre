@@ -6,7 +6,7 @@ type EmptyObject = Record<string, never>;
 type PayloadMap = Record<string, unknown>;
 
 function payload<TPayload>(): TPayload {
-  return undefined as unknown as TPayload;
+  return undefined as TPayload;
 }
 
 function definePayloadMap<TMap extends PayloadMap>(map: TMap): Readonly<TMap> {
@@ -217,10 +217,10 @@ export type PreviewRequestPayloadByType = PreviewCommandPayloadByType & PreviewQ
 
 export type PreviewRequestType = keyof PreviewRequestPayloadByType;
 
-export const PREVIEW_REQUEST_TYPES: readonly PreviewRequestType[] = [
+export const PREVIEW_REQUEST_TYPES = [
   ...PREVIEW_COMMAND_TYPES,
   ...PREVIEW_QUERY_TYPES,
-] as const;
+] as const satisfies readonly PreviewRequestType[];
 
 export interface PreviewReadyUpdatedPayload {
   ready: boolean;
@@ -272,10 +272,10 @@ export type RequestPayloadByType = SessionRequestPayloadByType & PreviewRequestP
 
 export type RequestType = keyof RequestPayloadByType;
 
-export const REQUEST_TYPES: readonly RequestType[] = [
+export const REQUEST_TYPES = [
   ...SESSION_REQUEST_TYPES,
   ...PREVIEW_REQUEST_TYPES,
-] as const;
+] as const satisfies readonly RequestType[];
 
 export type PreviewCommandResponsePayloadByType = Record<PreviewCommandType, EmptyObject>;
 
@@ -291,7 +291,7 @@ export type PreviewResponsePayloadByType = PreviewCommandResponsePayloadByType &
 
 export type PreviewResponseType = PreviewRequestType;
 
-export const PREVIEW_RESPONSE_TYPES: readonly PreviewResponseType[] = PREVIEW_REQUEST_TYPES;
+export const PREVIEW_RESPONSE_TYPES = PREVIEW_REQUEST_TYPES satisfies readonly PreviewResponseType[];
 
 export const SESSION_RESPONSE_PAYLOADS = definePayloadMap({
   [SESSION_REGISTER_PREVIEW_TYPE]: payload<EmptyObject>(),
@@ -307,10 +307,10 @@ export type ResponsePayloadByType = SessionResponsePayloadByType & PreviewRespon
 
 export type ResponseType = keyof ResponsePayloadByType;
 
-export const RESPONSE_TYPES: readonly ResponseType[] = [
+export const RESPONSE_TYPES = [
   ...SESSION_RESPONSE_TYPES,
   ...PREVIEW_RESPONSE_TYPES,
-] as const;
+] as const satisfies readonly ResponseType[];
 
 export const PREVIEW_REQUEST_ERROR_CODES = ['bad-request', 'unsupported-request-type', 'internal-error'] as const;
 

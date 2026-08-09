@@ -13,7 +13,7 @@ describe('ManageGameController', () => {
       providers: [
         { provide: WebgalFsService, useValue: {} },
         { provide: ManageGameService, useValue: {} },
-        { provide: ConsoleLogger, useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() } },
+        { provide: ConsoleLogger, useValue: { log: jest.fn() } },
       ],
     }).compile();
 
