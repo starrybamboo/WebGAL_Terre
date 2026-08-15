@@ -572,9 +572,6 @@ msgstr "Animation name"
 msgid "动画帧控制"
 msgstr "Frame control"
 
-msgid "半张嘴"
-msgstr "Half open mouth"
-
 msgid "单位毫秒。 0~ 有效"
 msgstr "Unit milliseconds. 0~ valid"
 
@@ -683,9 +680,6 @@ msgstr "Enable when condition"
 msgid "启用视频跳过"
 msgstr "Enable video skipping"
 
-msgid "唇形同步与眨眼"
-msgstr "Lip sync and blinking"
-
 msgid "回收站"
 msgstr "Trash"
 
@@ -700,9 +694,6 @@ msgstr "Graphical editor"
 
 msgid "图片"
 msgstr "Image"
-
-msgid "图片差分"
-msgstr "Image differential"
 
 msgid "圆形"
 msgstr "Circle"
@@ -1018,9 +1009,6 @@ msgstr "Start"
 
 msgid "开始迁移"
 msgstr "Start migration"
-
-msgid "张开嘴"
-msgstr "Open mouth"
 
 msgid "强度"
 msgstr "Intensity"
@@ -1781,9 +1769,6 @@ msgstr "Blink interval (ms)"
 msgid "眨眼间隔随机变化(毫秒)"
 msgstr "Blink interval random variation (ms)"
 
-msgid "睁开眼睛"
-msgstr "Open eyes"
-
 msgid "睁眼(毫秒)"
 msgstr "Opening duration (ms)"
 
@@ -2425,12 +2410,6 @@ msgstr "Long-lived variable"
 
 msgid "长效变量用途"
 msgstr "Long-lived variable usage"
-
-msgid "闭上嘴"
-msgstr "Close Mouth"
-
-msgid "闭上眼睛"
-msgstr "Close Eyes"
 
 msgid "闭眼(毫秒)"
 msgstr "Closing duration (ms)"

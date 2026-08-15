@@ -78,24 +78,6 @@ export interface IFreeFigure {
   key: string;
 }
 
-export interface IFigureAssociatedAnimation {
-  mouthAnimation: IMouthAnimationFile;
-  blinkAnimation: IEyesAnimationFile;
-  targetId: string;
-  animationFlag: string;
-}
-
-export interface IMouthAnimationFile {
-  open: string;
-  close: string;
-  halfOpen: string;
-}
-
-export interface IEyesAnimationFile {
-  open: string;
-  close: string;
-}
-
 /**
  * 启动演出接口
  * @interface IRunPerform
@@ -121,7 +103,6 @@ export interface IStageState {
   figNameRight14: string; // 立绘_右 1/4 文件地址（相对或绝对）
   // 自由立绘
   freeFigure: Array<IFreeFigure>;
-  figureAssociatedAnimation: Array<IFigureAssociatedAnimation>;
   showText: string; // 文字
   showTextSize: number; // 文字
   showName: string; // 人物名

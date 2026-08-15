@@ -572,9 +572,6 @@ msgstr "アニメーション名"
 msgid "动画帧控制"
 msgstr "フレームコントロール"
 
-msgid "半张嘴"
-msgstr "半分開いた口"
-
 msgid "单位毫秒。 0~ 有效"
 msgstr "ミリ秒単位。 0~ 有効"
 
@@ -683,9 +680,6 @@ msgstr "when 条件を有効化"
 msgid "启用视频跳过"
 msgstr "動画のスキップを有効にする"
 
-msgid "唇形同步与眨眼"
-msgstr "口パクとまばたき"
-
 msgid "回收站"
 msgstr "ゴミ箱"
 
@@ -700,9 +694,6 @@ msgstr "グラフィックエディタ"
 
 msgid "图片"
 msgstr "画像"
-
-msgid "图片差分"
-msgstr "画像差分"
 
 msgid "圆形"
 msgstr "円形"
@@ -1018,9 +1009,6 @@ msgstr "開始"
 
 msgid "开始迁移"
 msgstr "移行を開始"
-
-msgid "张开嘴"
-msgstr "開いた口"
 
 msgid "强度"
 msgstr "強度"
@@ -1781,9 +1769,6 @@ msgstr "瞬き間隔（ミリ秒）"
 msgid "眨眼间隔随机变化(毫秒)"
 msgstr "瞬き間隔のランダム変化（ミリ秒）"
 
-msgid "睁开眼睛"
-msgstr "開いた目"
-
 msgid "睁眼(毫秒)"
 msgstr "目を開ける（ミリ秒）"
 
@@ -2425,12 +2410,6 @@ msgstr "長期変数"
 
 msgid "长效变量用途"
 msgstr "長期変数の用途"
-
-msgid "闭上嘴"
-msgstr "閉じた口"
-
-msgid "闭上眼睛"
-msgstr "閉じた目"
 
 msgid "闭眼(毫秒)"
 msgstr "目を閉じる（ミリ秒）"

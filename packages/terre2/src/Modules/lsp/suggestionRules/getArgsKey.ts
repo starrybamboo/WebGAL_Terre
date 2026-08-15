@@ -59,12 +59,6 @@ export function getArgsKey(
         expressionKey,
         skinKey,
         boundsKey,
-        animationFlagKey,
-        eyesOpenKey,
-        eyesCloseKey,
-        mouthOpenKey,
-        mouthHalfOpenKey,
-        mouthCloseKey,
         enterAnimationKey,
         exitAnimationKey,
         easeKey,
@@ -621,96 +615,6 @@ const blendModeKey: CompletionItem = {
 
 \`\`\`
 changeFigure:xxx.png -blendMode=add;
-\`\`\`
-  `),
-};
-
-const animationFlagKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'animationFlag',
-  insertText: 'animationFlag=',
-  detail: '唇形同步与眨眼',
-  documentation: markdown(`
-当 \`animationFlag\` 设置为 \`on\` 时，可为图片立绘开启唇形同步与眨眼
-本质上是多个静态图片切换
-
-\`\`\`
-changeFigure:char.png -animationFlag=on -eyesOpen=char_eyes_open.png -eyesClose=char_eyes_close.png -mouthOpen=mouth.png -mouthHalfOpen=char_mouth_half_open.png -mouthClose=char_mouth_close.png; 
-\`\`\`
-  `),
-};
-
-const eyesOpenKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'eyesOpen',
-  insertText: 'eyesOpen=',
-  detail: '眼睛睁开的图片立绘',
-  documentation: markdown(`
-当 \`animationFlag\` 设置为 \`on\` 时，可为图片立绘开启唇形同步与眨眼
-本质上是多个静态图片切换
-
-\`\`\`
-changeFigure:char.png -animationFlag=on -eyesOpen=char_eyes_open.png -eyesClose=char_eyes_close.png -mouthOpen=mouth.png -mouthHalfOpen=char_mouth_half_open.png -mouthClose=char_mouth_close.png; 
-\`\`\`
-  `),
-};
-
-const eyesCloseKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'eyesClose',
-  insertText: 'eyesClose=',
-  detail: '眼睛闭上的图片立绘',
-  documentation: markdown(`
-当 \`animationFlag\` 设置为 \`on\` 时，可为图片立绘开启唇形同步与眨眼
-本质上是多个静态图片切换
-
-\`\`\`
-changeFigure:char.png -animationFlag=on -eyesOpen=char_eyes_open.png -eyesClose=char_eyes_close.png -mouthOpen=mouth.png -mouthHalfOpen=char_mouth_half_open.png -mouthClose=char_mouth_close.png; 
-\`\`\`
-  `),
-};
-
-const mouthOpenKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'mouthOpen',
-  insertText: 'mouthOpen=',
-  detail: '嘴巴张开的图片立绘',
-  documentation: markdown(`
-当 \`animationFlag\` 设置为 \`on\` 时，可为图片立绘开启唇形同步与眨眼
-本质上是多个静态图片切换
-
-\`\`\`
-changeFigure:char.png -animationFlag=on -eyesOpen=char_eyes_open.png -eyesClose=char_eyes_close.png -mouthOpen=mouth.png -mouthHalfOpen=char_mouth_half_open.png -mouthClose=char_mouth_close.png; 
-\`\`\`
-  `),
-};
-
-const mouthHalfOpenKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'mouthHalfOpen',
-  insertText: 'mouthHalfOpen=',
-  detail: '嘴巴半张开的图片立绘',
-  documentation: markdown(`
-当 \`animationFlag\` 设置为 \`on\` 时，可为图片立绘开启唇形同步与眨眼
-本质上是多个静态图片切换
-
-\`\`\`
-changeFigure:char.png -animationFlag=on -eyesOpen=char_eyes_open.png -eyesClose=char_eyes_close.png -mouthOpen=mouth.png -mouthHalfOpen=char_mouth_half_open.png -mouthClose=char_mouth_close.png; 
-\`\`\`
-  `),
-};
-
-const mouthCloseKey: CompletionItem = {
-  kind: CompletionItemKind.Constant,
-  label: 'mouthClose',
-  insertText: 'mouthClose=',
-  detail: '嘴巴闭上的图片立绘',
-  documentation: markdown(`
-当 \`animationFlag\` 设置为 \`on\` 时，可为图片立绘开启唇形同步与眨眼
-本质上是多个静态图片切换
-
-\`\`\`
-changeFigure:char.png -animationFlag=on -eyesOpen=char_eyes_open.png -eyesClose=char_eyes_close.png -mouthOpen=mouth.png -mouthHalfOpen=char_mouth_half_open.png -mouthClose=char_mouth_close.png; 
 \`\`\`
   `),
 };

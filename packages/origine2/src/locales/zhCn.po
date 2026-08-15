@@ -572,9 +572,6 @@ msgstr "动画名"
 msgid "动画帧控制"
 msgstr "动画帧控制"
 
-msgid "半张嘴"
-msgstr "半张嘴"
-
 msgid "单位毫秒。 0~ 有效"
 msgstr "单位毫秒。 0~ 有效"
 
@@ -683,9 +680,6 @@ msgstr "启用 when 条件"
 msgid "启用视频跳过"
 msgstr "启用视频跳过"
 
-msgid "唇形同步与眨眼"
-msgstr "唇形同步与眨眼"
-
 msgid "回收站"
 msgstr "回收站"
 
@@ -700,9 +694,6 @@ msgstr "图形编辑器"
 
 msgid "图片"
 msgstr "图片"
-
-msgid "图片差分"
-msgstr "图片差分"
 
 msgid "圆形"
 msgstr "圆形"
@@ -1018,9 +1009,6 @@ msgstr "开始"
 
 msgid "开始迁移"
 msgstr "开始迁移"
-
-msgid "张开嘴"
-msgstr "张开嘴"
 
 msgid "强度"
 msgstr "强度"
@@ -1781,9 +1769,6 @@ msgstr "眨眼间隔(毫秒)"
 msgid "眨眼间隔随机变化(毫秒)"
 msgstr "眨眼间隔随机变化(毫秒)"
 
-msgid "睁开眼睛"
-msgstr "睁开眼睛"
-
 msgid "睁眼(毫秒)"
 msgstr "睁眼(毫秒)"
 
@@ -2425,12 +2410,6 @@ msgstr "长效变量"
 
 msgid "长效变量用途"
 msgstr "长效变量用途"
-
-msgid "闭上嘴"
-msgstr "闭上嘴"
-
-msgid "闭上眼睛"
-msgstr "闭上眼睛"
 
 msgid "闭眼(毫秒)"
 msgstr "闭眼(毫秒)"

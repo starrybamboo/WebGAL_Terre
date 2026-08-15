@@ -572,9 +572,6 @@ msgstr "애니메이션 이름"
 msgid "动画帧控制"
 msgstr "애니메이션 프레임 제어"
 
-msgid "半张嘴"
-msgstr "반쯤 벌린 입"
-
 msgid "单位毫秒。 0~ 有效"
 msgstr "단위는 밀리초. 0~ 유효"
 
@@ -683,9 +680,6 @@ msgstr "when 조건 활성화"
 msgid "启用视频跳过"
 msgstr "비디오 건너뛰기 활성화"
 
-msgid "唇形同步与眨眼"
-msgstr "립싱크 및 눈 깜박임"
-
 msgid "回收站"
 msgstr "휴지통"
 
@@ -700,9 +694,6 @@ msgstr "그래픽 에디터"
 
 msgid "图片"
 msgstr "그림"
-
-msgid "图片差分"
-msgstr "이미지 차분"
 
 msgid "圆形"
 msgstr "원형"
@@ -1018,9 +1009,6 @@ msgstr "시작"
 
 msgid "开始迁移"
 msgstr "이동 시작"
-
-msgid "张开嘴"
-msgstr "벌린 입"
 
 msgid "强度"
 msgstr "강도"
@@ -1781,9 +1769,6 @@ msgstr "눈 깜박임 간격 (밀리초)"
 msgid "眨眼间隔随机变化(毫秒)"
 msgstr "눈 깜박임 간격 무작위 변화 (밀리초)"
 
-msgid "睁开眼睛"
-msgstr "눈 뜨기"
-
 msgid "睁眼(毫秒)"
 msgstr "눈 뜬 시간 (밀리초)"
 
@@ -2425,12 +2410,6 @@ msgstr "장기 변수"
 
 msgid "长效变量用途"
 msgstr "장기 변수 용도"
-
-msgid "闭上嘴"
-msgstr "다문 입"
-
-msgid "闭上眼睛"
-msgstr "감은 눈"
 
 msgid "闭眼(毫秒)"
 msgstr "눈 감은 시간(밀리초)"
